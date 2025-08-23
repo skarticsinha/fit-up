@@ -45,6 +45,7 @@ const AddProductForm = () => {
   const [gender, setGender] = useState("Men");
   const [selectedColors, setSelectedColors] = useState<ColorOption[]>([]);
   const [variantSizes, setVariantSizes] = useState<Record<string, Size[]>>({});
+  const [variantSkus, setVariantSkus] = useState<Record<string, string>>({});
   const [price, setPrice] = useState("");
   const [discountValue, setDiscountValue] = useState("");
   const [discountType, setDiscountType] = useState("");
@@ -77,10 +78,14 @@ const AddProductForm = () => {
   const handleColorSelect = (colors: ColorOption[]) => {
     setSelectedColors(colors);
     const initialSizes: Record<string, Size[]> = {};
+    const initialSkus: Record<string, string> = {};
+
     colors.forEach((color) => {
       initialSizes[color.hex] = variantSizes[color.hex] || [];
+      initialSkus[color.hex] = variantSkus[color.hex] || "";
     });
     setVariantSizes(initialSizes);
+    setVariantSkus(initialSkus);
   };
 
   const handleVariantSizeChange = (colorHex: string, sizes: Size[]) => {
@@ -89,6 +94,14 @@ const AddProductForm = () => {
       [colorHex]: sizes,
     }));
   };
+
+  const handleVariantSkuChange = (colorHex: string, sku: string) => {
+  setVariantSkus((prev) => ({
+    ...prev,
+    [colorHex]: sku,
+  }));
+};
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,6 +166,7 @@ const AddProductForm = () => {
         price: Number(price),
         stock: Number(stock),
         mainimageurl: mainImageUrl || "",
+        sku: variantSkus[color.hex] || "",
         createdat: new Date().toISOString(),
         updatedat: new Date().toISOString(),
       };
@@ -302,6 +316,16 @@ const AddProductForm = () => {
                 onSelect={(sizes) => handleVariantSizeChange(color.hex, sizes)}
                 availableSizes={["XS", "S", "M", "L", "XL", "2XL", "3XL"]}
                 multiple={true}
+              />
+            </div>
+            {/* SKU Input */}
+            <div className="mt-2">
+              <label className="font-semibold block mb-1">SKU Code</label>
+              <input
+                value={variantSkus[color.hex] || ""}
+                onChange={(e) => handleVariantSkuChange(color.hex, e.target.value)}
+                placeholder="Enter SKU"
+                className="w-full rounded border px-3 py-2 bg-white"
               />
             </div>
           </div>
